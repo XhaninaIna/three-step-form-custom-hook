@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 
 const useFormData = () => {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(
+    () => Number(localStorage.getItem("currentStep")) || 1
+  );
   const [formData, setFormData] = useState({
     step1Data: { name: "", surname: "" },
     step2Data: { age: "", gender: "" },
@@ -26,14 +28,9 @@ const useFormData = () => {
     setFormData(savedData);
   }, []);
 
-  //   useEffect(() => {
-  //     console.log(
-  //       "Navigated to Step",
-  //       currentStep,
-  //       "with Data:",
-  //       formData[`step${currentStep}Data`]
-  //     );
-  //   }, [currentStep, formData]);
+  useEffect(() => {
+    localStorage.setItem("currentStep", currentStep);
+  }, [currentStep]);
 
   const setStepData = (step, data) => {
     const updatedData = { ...formData, [`step${step}Data`]: data };
@@ -71,6 +68,7 @@ const useFormData = () => {
     localStorage.removeItem("step1Data");
     localStorage.removeItem("step2Data");
     localStorage.removeItem("step3Data");
+    localStorage.removeItem("currentStep");
     setCurrentStep(1);
   };
 
