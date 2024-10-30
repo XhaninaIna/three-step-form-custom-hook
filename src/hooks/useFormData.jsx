@@ -30,22 +30,26 @@ const useFormData = () => {
 
   useEffect(() => {
     localStorage.setItem("currentStep", currentStep);
-    const stepDataKey = `step${currentStep}Data`;
-    if (formData[stepDataKey]) {
-      localStorage.setItem(stepDataKey, JSON.stringify(formData[stepDataKey]));
-    }
-  }, [formData, currentStep]);
+  }, [currentStep]);
+
+  const setStepData = (step, data) => {
+    const updatedData = { ...formData, [`step${step}Data`]: data };
+    localStorage.setItem(`step${step}Data`, JSON.stringify(data));
+    setFormData(updatedData);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     const stepDataKey = `step${currentStep}Data`;
-    setFormData((prevData) => ({
-      ...prevData,
-      [stepDataKey]: { ...prevData[stepDataKey], [name]: value },
-    }));
+    setFormData((prevData) => {
+      const updatedStepData = { ...prevData[stepDataKey], [name]: value };
+      localStorage.setItem(stepDataKey, JSON.stringify(updatedStepData));
+      return { ...prevData, [stepDataKey]: updatedStepData };
+    });
   };
 
   const handleNext = () => {
+    setStepData(currentStep, formData[`step${currentStep}Data`]);
     setCurrentStep((prev) => (prev < 3 ? prev + 1 : prev));
   };
 
@@ -54,6 +58,7 @@ const useFormData = () => {
   };
 
   const handleSubmit = () => {
+    setStepData(currentStep, formData[`step${currentStep}Data`]);
     console.log("Final Form Data Submitted:", formData);
     setFormData({
       step1Data: { name: "", surname: "" },
